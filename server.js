@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const PORT = process.env.PORT ?? 3001;
 const app = express();
-const db = require('./db/db.json');
+//const db = require('./db/db.json');
 const { v4: uuidv4 } = require('uuid');
 
 
@@ -12,24 +12,25 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 
-
-app.get('api/notes', (req, res) => {
-    fs.readFileSync('.db/db.json', (err, data) => {
-        if (err) throw err;
-        let dbData = JSON.parse(data);
-        res.json(dbData)
-    })
+app.get('/notes', (req, res) => {
+    return res.sendFile(path.join(__dirname, 'public/notes.html'));
 });
 
-app.post('api/notes', (req, res) => {
+app.get('api/notes', (req, res) => {
     const newNote = fs.writeFileSync('./db/db.json', 'utf8')
     const notes = JSON.parse(newNote);
     return res.json(notes);
 });
 
-app.get('/notes', (req, res) => {
-    return res.sendFile(path.join(__dirname, 'public/notes.html'));
+app.post('api/notes', (req, res) => {
+    const newNote = fs.writeFileSync('./db/db.json', 'utf8')
+    const notes = JSON.parse(newNote);
+    notes.push({...req.body, id: uuidv4()});
+    const data = JSON.stringify(notes);
+    fs.writeFileSync('./db/db.json', data)
+    return res.json('success');
 });
+
 
 app.get('*', (req, res) => {
     return res.sendFile(path.join(__dirname, 'public/index.html'));
