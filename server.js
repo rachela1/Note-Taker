@@ -31,7 +31,6 @@ app.post('api/notes', (req, res) => {
     return res.json('success');
 });
 
-
 app.get('*', (req, res) => {
     return res.sendFile(path.join(__dirname, 'public/index.html'));
 });
